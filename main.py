@@ -17,13 +17,11 @@ class MyLed():
 class Screen():
     def __init__(self, catch):
         self.catch = catch
-
-    def configurar(self):
-        _,img = self.catch.read()
-        h,w,_ = img.shape
+        _,self.img = self.catch.read()
+        h,w,_ = self.img.shape
         offset = 100
-        campo = img[offset:h-offset,offset:w-offset]
-        cv2.rectangle(img,(offset,offset),(w-offset,h-offset),(255,0,0),3)
+        campo = self.img[offset:h-offset,offset:w-offset]
+        cv2.rectangle(self.img,(offset,offset),(w-offset,h-offset),(255,0,0),3)
 
         corMediaLinha = np.average(campo,axis=0)
         corMedia = np.average(corMediaLinha,axis=0)
@@ -32,7 +30,7 @@ class Screen():
         return r, g, b
     
     def finalizar(self):
-        cv2.imshow('Img',img)
+        cv2.imshow('Img',self.img)
         cv2.waitKey(1)
 
 
@@ -45,7 +43,8 @@ blue = MyLed(board, 'azul', 7)
 
 cap = cv2.VideoCapture(0)
 janela = Screen(cap)
-r=b=g=0
+r = b = g = 0
+
 while True:
     
     janela.configurar()
