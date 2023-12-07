@@ -14,27 +14,29 @@ class MyLed():
     def LightsOFF(self):
         self.board.digital[self.porta].write(0)
 
-class Screen():
-    def __init__(self, catch):
-        self.catch = catch
-        _,self.img = self.catch.read()
-        h,w,_ = self.img.shape
-        offset = 100
-        campo = self.img[offset:h-offset,offset:w-offset]
-        cv2.rectangle(self.img,(offset,offset),(w-offset,h-offset),(255,0,0),3)
-
-        corMediaLinha = np.average(campo,axis=0)
-        corMedia = np.average(corMediaLinha,axis=0)
-        r,g,b = int(corMedia[2]),int(corMedia[1]),int(corMedia[0])
-
-        return r, g, b
+class IdentificarCores():
+    def __init__(self):
+        pass
     
-    def finalizar(self):
-        cv2.imshow('Img',self.img)
-        cv2.waitKey(1)
-
-
-port = 'COM7'
+    def vermelho(self, r, g, b):
+        if r>g and r>b :
+            return True
+        else:
+            return False
+    
+    def azul(self, r, g, b):
+        if b>g and b>r :
+            return True
+        else:
+            return False
+    
+    def verde(self, r, g, b):
+        if g>b and g>r :
+            return True
+        else:
+            return False
+    
+port = 'COM5'
 board = Arduino(port)
 
 red = MyLed(board, 'vermelho', 5)
@@ -42,26 +44,40 @@ green = MyLed(board, 'verde', 6)
 blue = MyLed(board, 'azul', 7)
 
 cap = cv2.VideoCapture(0)
-janela = Screen(cap)
-r = b = g = 0
+i = IdentificarCores()
 
 while True:
-    
-    janela.configurar()
+    _,img = cap.read()
+    h,w,_ = img.shape
+    offset = 100
+    campo = img[offset:h-offset,offset:w-offset]
+    cv2.rectangle(img,(offset,offset),(w-offset,h-offset),(255,0,0),3)
+    corMediaLinha = np.average(campo,axis=0)
+    corMedia = np.average(corMediaLinha,axis=0)
+    r,g,b = int(corMedia[2]),int(corMedia[1]),int(corMedia[0])
 
-    if b>g and b>r:
+    if i.azul(r, g, b):
         blue.LightsON()
+        red.LightsOFF()
+        green.LightsOFF()
 
-    elif r>g and r>b:
+    elif i.vermelho(r, g, b):
         red.LightsON()
+        green.LightsOFF()
+        blue.LightsOFF()
 
-    elif g>b and g>r:
+    elif i.verde(r, g, b):
         green.LightsON()
+        red.LightsOFF()
+        blue.LightsOFF()
 
     else:
         red.LightsOFF()
         green.LightsOFF()
         blue.LightsOFF()
+    
+    cv2.imshow('Img',img)
+    cv2.waitKey(1)
 
 
     

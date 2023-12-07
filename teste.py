@@ -13,7 +13,7 @@ class MyLed():
     def LightsOFF(self):
         self.board.digital[self.porta].write(0)
 
-port = 'COM7'
+port = 'COM5'
 board = Arduino(port)
 
 yellow = MyLed(board, 'amarelo', 5)
